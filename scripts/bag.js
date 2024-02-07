@@ -1,45 +1,50 @@
 const ConvenienceFees = 99;
-console.log(bagItems)
+// console.log("bagitems"+ bagItems);
 let bagItemsObj = [];
 
 onload();
 
-function onload(){
+function onload() {
     loadBagItemObj();
     displayBagItems();
     displayBagSummary();
 }
 
 function removeFromBag(itemId) {
-    bagItems = bagItems.filter(bagItemsId=> bagItemsId != itemId)
-    localStorage.setItem("bagItems",JSON.stringify(bagItems));
+    bagItems = bagItems.filter(bagItemsId => bagItemsId != itemId)
+    localStorage.setItem("bagItems", JSON.stringify(bagItems));
     loadBagItemObj();
     displayBagItems();
     displayBagSummary();
+    displayBagCount();
 }
 
-function loadBagItemObj(){
-    bagItemsObj = bagItems.map(itemId=>{
+function loadBagItemObj() {
+    bagItemsObj = bagItems.map(itemId => {
         for (let i = 0; i < items.length; i++) {
-            if( itemId == items[i].id){
+            if (itemId == items[i].id) {
                 return items[i];
             }
         }
     })
-    console.log(bagItemsObj)
+    // console.log("bagitemobj:" + bagItemsObj);
 }
 
 function displayBagItems() {
     let bagItemsContainer = document.querySelector('.bag-items-container');
-    let bagItemContent = ""    
+    let bagItemContent = ""
+    if (!bagItems.length) {
+        bagItemsContainer.innerHTML = "<div class='js-empty-bag'>Bag is Empty</div>";
+    } else {
     bagItemsObj.forEach(bagItem => {
         bagItemContent += generateItemHtml(bagItem);
     });
-    bagItemsContainer.innerHTML=bagItemContent;
+    bagItemsContainer.innerHTML = bagItemContent;
+    }
 }
 
 function generateItemHtml(item) {
-return `<div class="bag-item-container">
+    return `<div class="bag-item-container">
         <div class="item-left-part">
         <img class="bag-item-img" src="../${item.image}">
         </div>
@@ -59,45 +64,46 @@ return `<div class="bag-item-container">
                 <span class="delivery-details-days">${item.delivery_date}</span>
                 </div>
                 </div>
-                <div class="remove-from-cart" onclick="removeFromBag(${item.id})">X</div>
+                <div class="remove-from-cart" onclick="removeFromBag('${item.id}')">X</div>
                 </div>
                 `;
 }
 
-function displayBagSummary(){
+function displayBagSummary() {
     let totalItem = bagItems.length;
-    let totalMRP=0;
+    let totalMRP = 0;
     let totalDiscount = 0;
-    
-    bagItemsObj.forEach((bagItem)=>{
+
+    bagItemsObj.forEach((bagItem) => {
         totalMRP += bagItem.original_price;
         totalDiscount += bagItem.original_price - bagItem.current_price;
     })
-    
-    let finalPayment = totalMRP-totalDiscount+ConvenienceFees;
+
+    let finalPayment = totalMRP - totalDiscount + ConvenienceFees;
 
     let bagSummary = document.querySelector(".bag-summary");
-    bagSummary.innerHTML=`<div class="bag-details-container">
-    <div class="price-header">PRICE DETAILS (${totalItem} Items) </div>
-    <div class="price-item">
+        bagSummary.innerHTML = `<div class="bag-details-container">
+        <div class="price-header">PRICE DETAILS (${totalItem} Items)
+        </div>
+        <div class="price-item">
         <span class="price-item-tag">Total MRP</span>
         <span class="price-item-value">₹${totalMRP}</span>
-    </div>
-    <div class="price-item">
+        </div>
+        <div class="price-item">
         <span class="price-item-tag">Discount on MRP</span>
         <span class="price-item-value priceDetail-base-discount">-₹${totalDiscount}</span>
-    </div>
-    <div class="price-item">
+        </div>
+        <div class="price-item">
         <span class="price-item-tag">Convenience Fee</span>
         <span class="price-item-value">₹${ConvenienceFees}</span>
-    </div>
-    <hr>
-    <div class="price-footer">
+        </div>
+        <hr>
+        <div class="price-footer">
         <span class="price-item-tag">Total Amount</span>
         <span class="price-item-value">₹${finalPayment}</span>
-    </div>
-</div>
-<button class="btn-place-order">
-    <div class="css-xjhrni">PLACE ORDER</div>
-</button>`
+        </div>
+        </div>
+        <button class="btn-place-order">
+        <div class="css-xjhrni">PLACE ORDER</div>
+        </button>`
 }
